@@ -6,7 +6,13 @@ Developed by Drew Lickman
 ---
 
 # How to run the app:
-TODO
+1. Sign up for [Financial Modeling Prep](https://site.financialmodelingprep.com/developer/docs).
+2. Copy your API key from the developer docs page.
+3. Rename the local file `.env.example` to `.env`
+4. Paste your API key after `REACT_APP_FINANCIAL_MODELING_PREP_API_KEY=`
+5. In the terminal run the command `npm start` (to end it press CTRL+C)
+6. Open [http://localhost:3000/](http://localhost:3000/)
+
 ## [Link to deployed app](https://valueglance.com/)
 
 This app fetches annual income statements for AAPL (Apple) and allows users to filter and analyze key metrics.
