@@ -3,6 +3,7 @@ Internship Project for ValueGlance
 
 Developed by Drew Lickman
 
+This app fetches annual income statements for AAPL (Apple) and allows users to filter and analyze key metrics.
 ---
 
 # How to run the app:
@@ -12,14 +13,9 @@ Developed by Drew Lickman
 4. Paste your API key after `REACT_APP_FINANCIAL_MODELING_PREP_API_KEY=`
 5. In the terminal run the command `npm start` (to end it press CTRL+C)
 6. Open [http://localhost:3000/](http://localhost:3000/)
+7. If you want to change the stock ticker, currently you have to edit it at the top of `App.js`
 
 ## [Link to deployed app](https://valueglance.com/)
-
-This app fetches annual income statements for AAPL (Apple) and allows users to filter and analyze key metrics.
-
-The API is fetched from financialmodelingprep.com.
-
----
 
 # How it works:
 1. Fetches data from API and displays in a table.
