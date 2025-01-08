@@ -13,11 +13,13 @@ This app fetches annual income statements for AAPL (Apple) and allows users to f
 4. Paste your API key after `REACT_APP_FINANCIAL_MODELING_PREP_API_KEY=`
 5. In the terminal run the command `npm start` (to end it press CTRL+C)
 6. Open [http://localhost:3000/](http://localhost:3000/)
-7. If you want to change the stock ticker, currently you have to edit it at the top of `App.js`
+7. You can change the stock ticker by typing into the input box and either clicking the arrow or pressing Enter
 
 ## [Link to deployed app](https://valueglance.com/)
 
 # How it works:
-1. Fetches data from API and displays in a table.
-2. Data can be filtered by date, revenue, and net income.
-3. Data can be sorted by date, revenue, and net income.
+1. Fetches financial data from API and displays in a table.
+2. Data can be filtered by each column.
+3. Data can be sorted by each column.
+
+(Note: many fetching attemps may result in temporary loss of access to API data)

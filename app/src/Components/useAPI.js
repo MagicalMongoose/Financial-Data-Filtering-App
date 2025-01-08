@@ -1,6 +1,9 @@
-// Writen by Claude 3.5 Sonnet
+// API Fetching & Caching by Claude 3.5 Sonnet
 
 import { useState, useEffect } from 'react';
+
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 function useAPI(url) {
     const [data, setData] = useState(null);
@@ -8,19 +11,54 @@ function useAPI(url) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-    const fetchData = async () => {
-        try {
-        const response = await fetch(url);
-        const json = await response.json();
-        setData(json);
-        setLoading(false);
-        } catch (err) {
-        setError(err.message);
-        setLoading(false);
-        }
-    };
+        // Clean up expired cache entries
+        const cleanCache = () => {
+            const now = Date.now();
+            for (const [key, value] of cache.entries()) {
+                if (now - value.timestamp > CACHE_DURATION) {
+                    cache.delete(key);
+                }
+            }
+        };
 
-    fetchData();
+        const fetchData = async () => {
+            cleanCache(); // Clean cache before checking for cached data
+
+            // Check cache first
+            const cachedData = cache.get(url);
+            if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+                setData(cachedData.data);
+                setLoading(false);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Store in cache
+                cache.set(url, {
+                    data: result,
+                    timestamp: Date.now()
+                });
+
+                setData(result);
+                setError(null);
+            } catch (error) {
+                setError(error.message);
+                setData(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, [url]);
 
     return { data, loading, error };
