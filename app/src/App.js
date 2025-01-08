@@ -16,7 +16,15 @@ const Icon = ({ name }) => {
 	}
 };
 
-const columnTitles = ["Date", "Revenue", "Net Income", "Gross Profit", "EPS", "Operating Income"];
+const columnConfig = [
+	{ title: "Date", key: "date" },
+	{ title: "Revenue", key: "revenue" },
+	{ title: "Net Income", key: "netIncome" },
+	{ title: "Gross Profit", key: "grossProfit" },
+	{ title: "EPS", key: "eps" },
+	{ title: "Operating Income", key: "operatingIncome" }
+];
+
 const apiKey = process.env.REACT_APP_FINANCIAL_MODELING_PREP_API_KEY;
 
 function App() {
@@ -30,14 +38,36 @@ function App() {
 
 	let { data, loading, error } = useAPI(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?period=annual&apikey=${apiKey}`);
 
-	const sortData = (data) => {
-		if (!sortConfig.key) return data; //default if no sort set
+	// const sortData = (data) => {
+	// 	if (!sortConfig.key) return data; //default if no sort set
 
+	// 	return [...data].sort((a, b) => {
+	// 		if (a[sortConfig.key] < b[sortConfig.key])
+	// 			return sortConfig.direction === 'ascending' ? -1 : 1;
+	// 		if (a[sortConfig.key] > b[sortConfig.key])
+	// 			return sortConfig.direction === 'ascending' ? 1 : -1;
+	// 		return 0;
+	// 	});
+	// };
+
+	const sortData = (data) => {
+		if (!sortConfig.key) return data;
+	
 		return [...data].sort((a, b) => {
-			if (a[sortConfig.key] < b[sortConfig.key])
+			// Parse numeric values for financial columns
+			let aValue = a[sortConfig.key];
+			let bValue = b[sortConfig.key];
+			
+			// If the values start with $, remove it and convert to number
+			if (typeof aValue === 'string' && aValue.startsWith('$')) {
+				aValue = parseFloat(aValue.replace('$', ''));
+				bValue = parseFloat(bValue.replace('$', ''));
+			}
+	
+			if (aValue < bValue)
 				return sortConfig.direction === 'ascending' ? -1 : 1;
-			if (a[sortConfig.key] > b[sortConfig.key])
-				return sortConfig.direction === 'ascending' ? -1 : 1;
+			if (aValue > bValue)
+				return sortConfig.direction === 'ascending' ? 1 : -1;
 			return 0;
 		});
 	};
@@ -86,27 +116,24 @@ function App() {
 				<div>
 					<table>
 						<thead>
+							{/* HEADERS */}
 							<tr>
-								{/* HEADERS */}
-								{columnTitles.map((col) => {
-									const key = col.toLocaleLowerCase().replace(/\s+/g, '');
-									return (
-										<th
-											key={key}
-											onClick={() => handleSort(key)}
-											style={{ cursor: 'pointer' }}
-										>
-											<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-												{col}
-												<Icon name={sortConfig.key === key
-													? `sort-${sortConfig.direction}`
-													: "sort-descending"
-												}
-												/>
-											</div>
-										</th>
-									);
-								})}
+								{columnConfig.map(({ title, key }) => (
+									<th
+										key={key}
+										onClick={() => handleSort(key)}
+										style={{ cursor: 'pointer' }}
+									>
+										<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+											{title}
+											<Icon name={sortConfig.key === key
+												? `sort-${sortConfig.direction}`
+												: "sort-descending"
+											}
+											/>
+										</div>
+									</th>
+								))}
 							</tr>
 						</thead>
 						<tbody>
@@ -123,6 +150,7 @@ function App() {
 							))}
 						</tbody>
 					</table>
+					{/* Raw JSON: */}
 					{/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
 				</div>
 			</>
@@ -147,12 +175,12 @@ function App() {
 							style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', padding: 0 }}>
 							<Icon name="arrow-big-right" />
 						</button>
+						<Icon name="filter" />
 					</div>
 
 					{loading ? (<div>Loading...</div>) : (updateTable(data))}
 
-					<Icon name="filter" />
-					<Icon name="sort-ascending" />
+					
 				</header>
 			</div>
 		</>
