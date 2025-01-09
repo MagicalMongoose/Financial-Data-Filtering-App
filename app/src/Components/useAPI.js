@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 60 * 60 * 1000; // 60 minutes
 
 function useAPI(url) {
     const [data, setData] = useState(null);

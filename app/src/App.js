@@ -1,6 +1,8 @@
 import './App.css';
 import useAPI from './Components/useAPI';
 import { useState } from 'react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"
 
 let stockTicker = "AAPL"
 
@@ -34,36 +36,28 @@ function App() {
 		direction: 'ascending'
 	});
 	const [ticker, setTicker] = useState(`${stockTicker}`);
-	const [textInput, setTextInput] = useState(`${ticker}`);
+	const [tickerTextInput, setTickerTextInput] = useState(`${ticker}`); // separate so it doesn't refresh each keystroke
+
+	// for date filtering
+	const [startDate, setStartDate] = useState();
+	const [endDate, setEndDate] = useState();
 
 	let { data, loading, error } = useAPI(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?period=annual&apikey=${apiKey}`);
 
-	// const sortData = (data) => {
-	// 	if (!sortConfig.key) return data; //default if no sort set
-
-	// 	return [...data].sort((a, b) => {
-	// 		if (a[sortConfig.key] < b[sortConfig.key])
-	// 			return sortConfig.direction === 'ascending' ? -1 : 1;
-	// 		if (a[sortConfig.key] > b[sortConfig.key])
-	// 			return sortConfig.direction === 'ascending' ? 1 : -1;
-	// 		return 0;
-	// 	});
-	// };
-
 	const sortData = (data) => {
 		if (!sortConfig.key) return data;
-	
+
 		return [...data].sort((a, b) => {
 			// Parse numeric values for financial columns
 			let aValue = a[sortConfig.key];
 			let bValue = b[sortConfig.key];
-			
+
 			// If the values start with $, remove it and convert to number
 			if (typeof aValue === 'string' && aValue.startsWith('$')) {
 				aValue = parseFloat(aValue.replace('$', ''));
 				bValue = parseFloat(bValue.replace('$', ''));
 			}
-	
+
 			if (aValue < bValue)
 				return sortConfig.direction === 'ascending' ? -1 : 1;
 			if (aValue > bValue)
@@ -73,7 +67,7 @@ function App() {
 	};
 
 	const handleSearch = () => {
-		setTicker(textInput);
+		setTicker(tickerTextInput);
 	};
 
 	const handleKeyPress = (e) => {
@@ -91,7 +85,16 @@ function App() {
 		}));
 	};
 
+	const handleDateFilter = (range) => {
+		const [startDate, endDate] = range;
+		setStartDate(startDate);
+		setEndDate(endDate);
+		updateTable(data);
+	}
+
+
 	function updateTable(data) {
+		console.log("updateTable")
 		if (error) {
 			let errorMessage = "An error occurred";
 			if (error.includes("429")) {
@@ -108,12 +111,12 @@ function App() {
 				</>
 			);
 		}
-
+		// If there isn't an error:
 		const sortedData = sortData(data)
 		return (
 			<>
-				<h1>{ticker} Income Statement Overview</h1>
 				<div>
+					<h1>{ticker} Income Statement Overview</h1>
 					<table>
 						<thead>
 							{/* HEADERS */}
@@ -164,23 +167,100 @@ function App() {
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<input
 							type="text"
-							value={textInput}
-							onChange={(e) => setTextInput(e.target.value)}
+							value={tickerTextInput}
+							onChange={(e) => setTickerTextInput(e.target.value)}
 							onKeyDown={handleKeyPress}
 							placeholder="Enter stock ticker"
-							style={{ color: 'black', paddingRight: '30px' }}
+							style={{ color: 'black', padding: '5px' }}
 						/>
 						<button
-							onClick={() => setTicker(textInput)}
-							style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', padding: 0 }}>
+							onClick={() => setTicker(tickerTextInput)}
+							style={{
+								position: 'absolute',
+								right: '10px',
+								top: '50%',
+								transform: 'translateY(-50%)',
+								background: 'none',
+								border: 'none',
+								padding: 0
+							}}>
 							<Icon name="arrow-big-right" />
 						</button>
-						<Icon name="filter" />
 					</div>
 
-					{loading ? (<div>Loading...</div>) : (updateTable(data))}
+					{/* Split page into 3 columns */}
+					<div style={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						gap: '20px',
+						width: '100%'
+					}}>
+						{/* Column 1 */}
+						<div style=
+						{{
+							flex: '1',
+							border: '1px solid #ccc',
+							padding: '20px'
+						}}>
+							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+								<button onClick={() => (updateTable(data))} style={{ display: 'flex', alignItems: 'center' }}>
+									<span style={{ marginLeft: '5px' }}>Update Filter:</span>
+									<Icon name="filter" />
+								</button>
+							</div>
+							<p>Filter by Date:</p>
+							<DatePicker 
+								showMonthYearPicker
+								placeholderText={startDate ? startDate : "placeholder"}
+								selected={startDate}
+								onChange={handleDateFilter}
+								startDate={startDate}
+								endDate={endDate}
+								selectsRange
+								style={{ color: 'black', padding: '5px', backgroundColor: 'black', border: '1px solid #ccc', borderRadius: '4px' }}
+							/>
 
-					
+							<p>Filter by Revenue:</p>
+							<input
+								type="number"
+								value={0}
+								placeholderText="Lower Revenue"
+							/>
+							-
+							<input
+								type="number"
+								value={0}
+								placeholderText="Upper Revenue"
+							/>
+
+							<p>Filter by Net Income:</p>
+							<input
+								type="number"
+								value={0}
+								placeholderText="Lower Net Income"
+							/>
+							-
+							<input
+								type="number"
+								value={0}
+								placeholderText="Upper Net Income"
+							/>
+						</div>
+
+						{/* Column 2, main content */}
+						{loading ? (<div>Loading...</div>) : (updateTable(data))}
+
+						{/* Column 3 */}
+						<div style=
+						{{
+							flex: '1',
+							border: '1px solid #ccc',
+							padding: '0px'
+						}}>
+						<div style={{ backgroundImage: `url(${require('./Assets/Chart.png')})`, backgroundSize: 'cover', height: '100%', width: '100%' }} alt={"Stock chart going up"} />
+						</div>
+					</div>
+
 				</header>
 			</div>
 		</>
