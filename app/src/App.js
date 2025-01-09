@@ -38,11 +38,45 @@ function App() {
 	const [ticker, setTicker] = useState(`${stockTicker}`);
 	const [tickerTextInput, setTickerTextInput] = useState(`${ticker}`); // separate so it doesn't refresh each keystroke
 
-	// for date filtering
-	const [startDate, setStartDate] = useState();
-	const [endDate, setEndDate] = useState();
+	// holds data for filtering
+	const [dateInputs, setDateInputs] = useState({ start: null, end: null });
+	const [revenueInputs, setRevenueInputs] = useState({start: '', end: ''});
+	const [netIncomeInputs, setNetIncomeInputs] = useState({start: '', end: ''});
 
 	let { data, loading, error } = useAPI(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?period=annual&apikey=${apiKey}`);
+
+	const filterData = (data) => {
+		let filteredData = data;
+		if (dateInputs.start != null)
+		{
+
+		}
+		if (dateInputs.end != null)
+		{
+
+		}
+
+		if (revenueInputs.start != null)
+		{
+
+		}
+		if (revenueInputs.end != null)
+		{
+
+		}
+		
+		if (netIncomeInputs.start != null)
+		{
+
+		}
+		if (netIncomeInputs.end != null)
+		{
+
+		}
+
+		return filteredData;
+	}
+
 
 	const sortData = (data) => {
 		if (!sortConfig.key) return data;
@@ -86,12 +120,9 @@ function App() {
 	};
 
 	const handleDateFilter = (range) => {
-		const [startDate, endDate] = range;
-		setStartDate(startDate);
-		setEndDate(endDate);
-		updateTable(data);
+		const [start, end] = range;
+		setDateInputs({ start, end });
 	}
-
 
 	function updateTable(data) {
 		console.log("updateTable")
@@ -112,7 +143,8 @@ function App() {
 			);
 		}
 		// If there isn't an error:
-		const sortedData = sortData(data)
+		const filteredData = filterData(data)
+		const sortedData = sortData(filteredData)
 		return (
 			<>
 				<div>
@@ -209,41 +241,50 @@ function App() {
 								</button>
 							</div>
 							<p>Filter by Date:</p>
-							<DatePicker 
+							<DatePicker
+								style={{ color: 'black', padding: '5px' }}
 								showMonthYearPicker
-								placeholderText={startDate ? startDate : "placeholder"}
-								selected={startDate}
-								onChange={handleDateFilter}
-								startDate={startDate}
-								endDate={endDate}
+								placeholderText={dateInputs.start ? dateInputs.start : "All"}
+								selected={dateInputs.start}
+                                onChange={handleDateFilter}
+                                startDate={dateInputs.start}
+                                endDate={dateInputs.end}
 								selectsRange
-								style={{ color: 'black', padding: '5px', backgroundColor: 'black', border: '1px solid #ccc', borderRadius: '4px' }}
+								isClearable
 							/>
 
 							<p>Filter by Revenue:</p>
 							<input
 								type="number"
-								value={0}
-								placeholderText="Lower Revenue"
+								value={revenueInputs.start}
+								placeholder="Lower Revenue"
+								style={{ color: 'black', padding: '5px' }}
+								onChange={(e) => setRevenueInputs(prev => ({ ...prev, start: e.target.value }))}
 							/>
 							-
 							<input
 								type="number"
-								value={0}
-								placeholderText="Upper Revenue"
+								value={revenueInputs.end}
+								placeholder="Upper Revenue"
+								style={{ color: 'black', padding: '5px' }}
+								onChange={(e) => setRevenueInputs(prev => ({ ...prev, end: e.target.value }))}
 							/>
 
 							<p>Filter by Net Income:</p>
 							<input
 								type="number"
-								value={0}
-								placeholderText="Lower Net Income"
+								value={netIncomeInputs.start}
+								placeholder="Lower Net Income"
+								style={{ color: 'black', padding: '5px' }}
+								onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, start: e.target.value }))}
 							/>
 							-
 							<input
 								type="number"
-								value={0}
-								placeholderText="Upper Net Income"
+								value={netIncomeInputs.end}
+								placeholder="Upper Net Income"
+								style={{ color: 'black', padding: '5px' }}
+								onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, end: e.target.value }))}
 							/>
 						</div>
 
@@ -268,3 +309,9 @@ function App() {
 }
 
 export default App;
+
+/*
+Bugs:
+- Date filter text is white but I can't get CSS to fix it
+- 
+*/
