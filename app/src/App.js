@@ -1,6 +1,6 @@
 import './App.css';
 import useAPI from './Components/useAPI';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 
@@ -38,45 +38,62 @@ function App() {
 	const [ticker, setTicker] = useState(`${stockTicker}`);
 	const [tickerTextInput, setTickerTextInput] = useState(`${ticker}`); // separate so it doesn't refresh each keystroke
 
-	// holds data for filtering
+	// holds data for filtering (updated live)
 	const [dateInputs, setDateInputs] = useState({ start: null, end: null });
-	const [revenueInputs, setRevenueInputs] = useState({start: '', end: ''});
-	const [netIncomeInputs, setNetIncomeInputs] = useState({start: '', end: ''});
+	const [revenueInputs, setRevenueInputs] = useState({ start: '', end: '' });
+	const [netIncomeInputs, setNetIncomeInputs] = useState({ start: '', end: '' });
+
+	const [filteredCount, setFilteredCount] = useState(0);
+
+	// State for active filters (updates only when "Update Filter" is clicked)
+	const [activeFilters, setActiveFilters] = useState({
+		date: { start: null, end: null },
+		revenue: { start: '', end: '' },
+		netIncome: { start: '', end: '' }
+	});
 
 	let { data, loading, error } = useAPI(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?period=annual&apikey=${apiKey}`);
 
 	const filterData = (data) => {
-		let filteredData = data;
-		if (dateInputs.start != null)
-		{
-
-		}
-		if (dateInputs.end != null)
-		{
-
-		}
-
-		if (revenueInputs.start != null)
-		{
-
-		}
-		if (revenueInputs.end != null)
-		{
-
-		}
+		if (!data) return [];
 		
-		if (netIncomeInputs.start != null)
-		{
+		return data.filter(statement => {
+			// Date filter
+			if (activeFilters.date.start && new Date(statement.date) < new Date(activeFilters.date.start)) {
+				return false;
+			}
+			if (activeFilters.date.end && new Date(statement.date) > new Date(activeFilters.date.end)) {
+				return false;
+			}
 
+			// Revenue filter
+			if (activeFilters.revenue.start && Number(statement.revenue) < Number(activeFilters.revenue.start)) {
+				return false;
+			}
+			if (activeFilters.revenue.end && Number(statement.revenue) > Number(activeFilters.revenue.end)) {
+				return false;
+			}
+
+			// Net Income filter
+			if (activeFilters.netIncome.start && Number(statement.netIncome) < Number(activeFilters.netIncome.start)) {
+				return false;
+			}
+			if (activeFilters.netIncome.end && Number(statement.netIncome) > Number(activeFilters.netIncome.end)) {
+				return false;
+			}
+
+			return true;
+		});
+	};
+
+	// Add useEffect to handle filtered count updates
+	useEffect(() => {
+		if (data) {
+			const filtered = filterData(data);
+			const count = data.length - filtered.length;
+			setFilteredCount(count);
 		}
-		if (netIncomeInputs.end != null)
-		{
-
-		}
-
-		return filteredData;
-	}
-
+	}, [data, activeFilters]); // Only update when data or active filters change
 
 	const sortData = (data) => {
 		if (!sortConfig.key) return data;
@@ -119,13 +136,16 @@ function App() {
 		}));
 	};
 
-	const handleDateFilter = (range) => {
-		const [start, end] = range;
-		setDateInputs({ start, end });
-	}
+
+	const handleUpdateFilter = () => {
+		setActiveFilters({
+			date: dateInputs,
+			revenue: revenueInputs,
+			netIncome: netIncomeInputs
+		});
+	};
 
 	function updateTable(data) {
-		console.log("updateTable")
 		if (error) {
 			let errorMessage = "An error occurred";
 			if (error.includes("429")) {
@@ -145,6 +165,7 @@ function App() {
 		// If there isn't an error:
 		const filteredData = filterData(data)
 		const sortedData = sortData(filteredData)
+
 		return (
 			<>
 				<div>
@@ -221,36 +242,44 @@ function App() {
 					</div>
 
 					{/* Split page into 3 columns */}
-					<div style={{
+					<div 
+						style={{
 						display: 'flex',
 						justifyContent: 'space-between',
 						gap: '20px',
 						width: '100%'
 					}}>
 						{/* Column 1 */}
-						<div style=
-						{{
-							flex: '1',
-							border: '1px solid #ccc',
-							padding: '20px'
-						}}>
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-								<button onClick={() => (updateTable(data))} style={{ display: 'flex', alignItems: 'center' }}>
+						<div 
+							style= {{
+								flex: '1',
+								border: '1px solid #ccc',
+								padding: '20px'
+							}}>
+							<div 
+								style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+								<button
+									onClick={handleUpdateFilter}
+									style={{ display: 'flex', alignItems: 'center' }}>
 									<span style={{ marginLeft: '5px' }}>Update Filter:</span>
 									<Icon name="filter" />
 								</button>
 							</div>
+
 							<p>Filter by Date:</p>
 							<DatePicker
 								style={{ color: 'black', padding: '5px' }}
 								showMonthYearPicker
-								placeholderText={dateInputs.start ? dateInputs.start : "All"}
-								selected={dateInputs.start}
-                                onChange={handleDateFilter}
-                                startDate={dateInputs.start}
-                                endDate={dateInputs.end}
 								selectsRange
 								isClearable
+								placeholderText={dateInputs.start ? dateInputs.start : "All dates"}
+								selected={dateInputs.start}
+								onChange={(dates) => {
+                                    const [start, end] = dates;
+                                    setDateInputs({ start, end });
+                                }}
+								startDate={dateInputs.start}
+								endDate={dateInputs.end}
 							/>
 
 							<p>Filter by Revenue:</p>
@@ -286,6 +315,7 @@ function App() {
 								style={{ color: 'black', padding: '5px' }}
 								onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, end: e.target.value }))}
 							/>
+							<p>Filtering {filteredCount} {filteredCount === 1 ? "statement" : "statements"}</p>
 						</div>
 
 						{/* Column 2, main content */}
@@ -293,12 +323,12 @@ function App() {
 
 						{/* Column 3 */}
 						<div style=
-						{{
-							flex: '1',
-							border: '1px solid #ccc',
-							padding: '0px'
-						}}>
-						<div style={{ backgroundImage: `url(${require('./Assets/Chart.png')})`, backgroundSize: 'cover', height: '100%', width: '100%' }} alt={"Stock chart going up"} />
+							{{
+								flex: '1',
+								border: '1px solid #ccc',
+								padding: '0px'
+							}}>
+							<div style={{ backgroundImage: `url(${require('./Assets/Chart.png')})`, backgroundSize: 'cover', height: '100%', width: '100%' }} alt={"Stock chart going up"} />
 						</div>
 					</div>
 
