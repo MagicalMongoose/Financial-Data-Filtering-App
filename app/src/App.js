@@ -3,6 +3,7 @@ import useAPI from './Components/useAPI';
 import { useState, useEffect } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 let stockTicker = "AAPL"
 
@@ -28,6 +29,16 @@ const columnConfig = [
 ];
 
 const apiKey = process.env.REACT_APP_FINANCIAL_MODELING_PREP_API_KEY;
+
+const formatLargeNumbers = (number) => {
+	if (number >= 1e9) {
+		return `$${(number / 1e9).toFixed(1)}B`;
+	}
+	if (number >= 1e6) {
+		return `$${(number / 1e6).toFixed(1)}M`;
+	}
+	return `$${number}`;
+};
 
 function App() {
 
@@ -86,7 +97,6 @@ function App() {
 		});
 	};
 
-	// Add useEffect to handle filtered count updates
 	useEffect(() => {
 		if (data) {
 			const filtered = filterData(data);
@@ -136,7 +146,6 @@ function App() {
 		}));
 	};
 
-
 	const handleUpdateFilter = () => {
 		setActiveFilters({
 			date: dateInputs,
@@ -144,6 +153,10 @@ function App() {
 			netIncome: netIncomeInputs
 		});
 	};
+
+	const filteredData = data ? filterData(data) : [];
+	const sortedData = sortData(filteredData);
+	const chartData = [...filteredData].sort((a, b) => new Date(b.date) - new Date(a.date));
 
 	function updateTable(data) {
 		if (error) {
@@ -162,13 +175,13 @@ function App() {
 				</>
 			);
 		}
-		// If there isn't an error:
-		const filteredData = filterData(data)
-		const sortedData = sortData(filteredData)
 
 		return (
 			<>
-				<div>
+				<div
+					style = {{
+						fontSize: `calc(2vmin)`
+					}}>
 					<h1>{ticker} Income Statement Overview</h1>
 					<table>
 						<thead>
@@ -217,30 +230,6 @@ function App() {
 		<>
 			<div className="App">
 				<header className="App-header">
-					<div style={{ position: 'relative', display: 'inline-block' }}>
-						<input
-							type="text"
-							value={tickerTextInput}
-							onChange={(e) => setTickerTextInput(e.target.value)}
-							onKeyDown={handleKeyPress}
-							placeholder="Enter stock ticker"
-							style={{ color: 'black', padding: '5px' }}
-						/>
-						<button
-							onClick={() => setTicker(tickerTextInput)}
-							style={{
-								position: 'absolute',
-								right: '10px',
-								top: '50%',
-								transform: 'translateY(-50%)',
-								background: 'none',
-								border: 'none',
-								padding: 0
-							}}>
-							<Icon name="arrow-big-right" />
-						</button>
-					</div>
-
 					{/* Split page into 3 columns */}
 					<div 
 						style={{
@@ -253,82 +242,151 @@ function App() {
 						<div 
 							style= {{
 								flex: '1',
-								border: '1px solid #ccc',
 								padding: '20px'
 							}}>
-							<div 
-								style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-								<button
-									onClick={handleUpdateFilter}
-									style={{ display: 'flex', alignItems: 'center' }}>
-									<span style={{ marginLeft: '5px' }}>Update Filter:</span>
-									<Icon name="filter" />
-								</button>
+
+							<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+								<div 
+									style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+									<button
+										onClick={handleUpdateFilter}
+										style={{ display: 'flex', alignItems: 'center' }}>
+										<span style={{ marginLeft: '5px' }}>Update Filter:</span>
+										<Icon name="filter" />
+									</button>
+								</div>
+
+								<p>Filter by Date:</p>
+								<DatePicker
+									style={{ color: 'black', padding: '5px' }}
+									showMonthYearPicker
+									selectsRange
+									isClearable
+									placeholderText={dateInputs.start ? dateInputs.start : "All dates"}
+									selected={dateInputs.start}
+									onChange={(dates) => {
+										const [start, end] = dates;
+										setDateInputs({ start, end });
+									}}
+									startDate={dateInputs.start}
+									endDate={dateInputs.end}
+								/>
+
+								<p>Filter by Revenue:</p>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<input
+										type="number"
+										value={revenueInputs.start}
+										placeholder="Lower Revenue"
+										style={{ color: 'black', padding: '5px', marginRight: '5px' }}
+										onChange={(e) => setRevenueInputs(prev => ({ ...prev, start: e.target.value }))}
+									/>
+									<span>-</span>
+									<input
+										type="number"
+										value={revenueInputs.end}
+										placeholder="Upper Revenue"
+										style={{ color: 'black', padding: '5px', marginLeft: '5px' }}
+										onChange={(e) => setRevenueInputs(prev => ({ ...prev, end: e.target.value }))}
+									/>
+								</div>
+
+								<p>Filter by Net Income:</p>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<input
+										type="number"
+										value={netIncomeInputs.start}
+										placeholder="Lower Net Income"
+										style={{ color: 'black', padding: '5px', marginRight: '5px' }}
+										onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, start: e.target.value }))}
+									/>
+									<span>-</span>
+									<input
+										type="number"
+										value={netIncomeInputs.end}
+										placeholder="Upper Net Income"
+										style={{ color: 'black', padding: '5px', marginLeft: '5px' }}
+										onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, end: e.target.value }))}
+									/>
+								</div>
+								<p>Filtering {filteredCount} {filteredCount === 1 ? "statement" : "statements"}</p>
 							</div>
-
-							<p>Filter by Date:</p>
-							<DatePicker
-								style={{ color: 'black', padding: '5px' }}
-								showMonthYearPicker
-								selectsRange
-								isClearable
-								placeholderText={dateInputs.start ? dateInputs.start : "All dates"}
-								selected={dateInputs.start}
-								onChange={(dates) => {
-                                    const [start, end] = dates;
-                                    setDateInputs({ start, end });
-                                }}
-								startDate={dateInputs.start}
-								endDate={dateInputs.end}
-							/>
-
-							<p>Filter by Revenue:</p>
-							<input
-								type="number"
-								value={revenueInputs.start}
-								placeholder="Lower Revenue"
-								style={{ color: 'black', padding: '5px' }}
-								onChange={(e) => setRevenueInputs(prev => ({ ...prev, start: e.target.value }))}
-							/>
-							-
-							<input
-								type="number"
-								value={revenueInputs.end}
-								placeholder="Upper Revenue"
-								style={{ color: 'black', padding: '5px' }}
-								onChange={(e) => setRevenueInputs(prev => ({ ...prev, end: e.target.value }))}
-							/>
-
-							<p>Filter by Net Income:</p>
-							<input
-								type="number"
-								value={netIncomeInputs.start}
-								placeholder="Lower Net Income"
-								style={{ color: 'black', padding: '5px' }}
-								onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, start: e.target.value }))}
-							/>
-							-
-							<input
-								type="number"
-								value={netIncomeInputs.end}
-								placeholder="Upper Net Income"
-								style={{ color: 'black', padding: '5px' }}
-								onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, end: e.target.value }))}
-							/>
-							<p>Filtering {filteredCount} {filteredCount === 1 ? "statement" : "statements"}</p>
 						</div>
 
 						{/* Column 2, main content */}
-						{loading ? (<div>Loading...</div>) : (updateTable(data))}
+						<div style={{ 
+							flex: '2', 
+							display: 'flex', 
+							flexDirection: 'column', 
+							alignItems: 'center'
+							}}>
+							<div style={{ 
+								position: 'relative', 
+								display: 'inline-block', 
+								marginBottom: '10px' }}>
+								<input
+									type="text"
+									value={tickerTextInput}
+									onChange={(e) => setTickerTextInput(e.target.value)}
+									onKeyDown={handleKeyPress}
+									placeholder="Enter stock ticker"
+									style={{ color: 'black', padding: '5px' }}
+								/>
+								<button
+									onClick={() => setTicker(tickerTextInput)}
+									style={{
+										position: 'absolute',
+										right: '10px',
+										top: '50%',
+										transform: 'translateY(-50%)',
+										background: 'none',
+										border: 'none',
+										padding: 0
+									}}>
+									<Icon name="arrow-big-right" />
+								</button>
+							</div>
+							{loading ? (<div>Loading...</div>) : (updateTable(data))}
+						</div>
 
 						{/* Column 3 */}
-						<div style=
-							{{
-								flex: '1',
-								border: '1px solid #ccc',
-								padding: '0px'
-							}}>
-							<div style={{ backgroundImage: `url(${require('./Assets/Chart.png')})`, backgroundSize: 'cover', height: '100%', width: '100%' }} alt={"Stock chart going up"} />
+						<div style={{
+							flex: '1',
+							padding: '20px'
+						}}>
+							<ResponsiveContainer width="100%" height="100%">
+								<LineChart
+									data={chartData}
+									margin={{
+										top: 80,
+										right: 0,
+										left: 0,
+										bottom: 50,
+									}}
+								>
+									<CartesianGrid strokeDasharray="3 3" />
+									<XAxis 
+										dataKey="date" 
+										tick={{ fill: 'white', angle: 45, textAnchor: 'start' }}  // Make axis labels white and diagonal
+										reversed={true}
+									/>
+									<YAxis 
+										tick={{ fill: 'white' }}  // Make axis labels white
+										tickFormatter={formatLargeNumbers}
+									/>
+									<Tooltip 
+										formatter={(value) => formatLargeNumbers(value)}
+										labelStyle={{ color: 'black' }}
+									/>
+									<Line
+										type="monotone"
+										dataKey="revenue"
+										stroke="#8884d8"
+										strokeWidth={2}
+										dot={{ fill: '#8884d8' }}
+									/>
+								</LineChart>
+							</ResponsiveContainer>
 						</div>
 					</div>
 
