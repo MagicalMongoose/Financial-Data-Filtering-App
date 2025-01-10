@@ -43,8 +43,8 @@ const formatLargeNumbers = (number) => {
 function App() {
 
 	const [sortConfig, setSortConfig] = useState({
-		key: null,
-		direction: 'ascending'
+		key: 'date',
+		direction: 'descending'
 	});
 	const [ticker, setTicker] = useState(`${stockTicker}`);
 	const [tickerTextInput, setTickerTextInput] = useState(`${ticker}`); // separate so it doesn't refresh each keystroke
@@ -140,9 +140,9 @@ function App() {
 	const handleSort = (key) => {
 		setSortConfig(prevSort => ({
 			key,
-			direction: prevSort.key === key && prevSort.direction === 'ascending' //toggle direction
-				? 'descending'
-				: 'ascending'
+			direction: prevSort.key === key && prevSort.direction === 'descending' //toggle direction
+				? 'ascending'
+				: 'descending'
 		}));
 	};
 
@@ -216,6 +216,7 @@ function App() {
 			);
 		}
 
+		// Display the resulting table
 		return (
 			<>
 				<div className="text-[2vmin]">
@@ -227,15 +228,13 @@ function App() {
 									<th
 										key={key}
 										onClick={() => handleSort(key)}
-										className="cursor-pointer p-2 border border-gray-600"
+										className="cursor-pointer p-4 border border-gray-600"
 									>
 										<div className="flex items-center gap-1">
 											{title}
-											<Icon name={sortConfig.key === key
-												? `sort-${sortConfig.direction}`
-												: "sort-descending"
-											}
-											/>
+											{sortConfig.key === key && (
+												<Icon name={`sort-${sortConfig.direction}`} />
+											)}
 										</div>
 									</th>
 								))}
@@ -262,10 +261,11 @@ function App() {
 	return (
 		<div className="App">
 			<header className="min-h-screen bg-[#323232] text-white flex flex-col items-center justify-center text-[calc(5px+1vmin)]">
-				<div className="flex justify-between gap-5 w-full">
-					<div className="w-1/4 min-w-[250px] p-5">
-						<div className="flex flex-col items-center justify-center h-full gap-2">
 
+				<div className="w-full container mx-auto flex flex-col md:flex-row md:flex-nowrap justify-between gap-4 max-w-[1920px] p-4">
+					<aside className="w-full md:w-1/4 p-5 border border-gray-600 rounded-lg">
+						<div className="flex flex-col items-center justify-center h-full gap-2 ">
+							{/* COLUMN 1 */}
 							<div>
 								<p>Filter by Date:</p>
 								<DatePicker
@@ -338,9 +338,9 @@ function App() {
 								</button>
 							</div>
 						</div>
-					</div>
-
-					<div className="w-2/4 min-w-[500px] flex flex-col items-center">
+					</aside>
+					{/* COLUMN 2 */}
+					<div className="flex-grow md:w-2/4 flex flex-col items-center border border-gray-600 rounded-lg">
 						<div className="relative inline-block mb-2">
 							<input
 								type="text"
@@ -359,8 +359,8 @@ function App() {
 						</div>
 						{loading ? <div>Loading...</div> : updateTable(data)}
 					</div>
-
-					<div className="w-1/4 min-w-[250px] p-5">
+					{/* COLUMN 3 */}
+					<aside className="lg:w-1/4 p-5 border border-gray-600 rounded-lg">
 						{loading ? (
 							<div className="w-full h-[400px] bg-gray-600/30 rounded animate-pulse" />
 						) : (
@@ -403,7 +403,7 @@ function App() {
 								</LineChart>
 							</ResponsiveContainer>
 						)}
-					</div>
+					</aside>
 				</div>
 			</header>
 		</div>
