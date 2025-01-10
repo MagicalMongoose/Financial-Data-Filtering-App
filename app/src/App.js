@@ -401,5 +401,7 @@ export default App;
 /*
 Bugs:
 - Date filter text is white but I can't get CSS to fix it
-- 
+
+Potential additions:
+- Buttons to display chart for other columns 
 */
