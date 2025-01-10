@@ -67,7 +67,7 @@ function App() {
 
 	const filterData = (data) => {
 		if (!data) return [];
-		
+
 		return data.filter(statement => {
 			// Date filter
 			if (activeFilters.date.start && new Date(statement.date) < new Date(activeFilters.date.start)) {
@@ -128,7 +128,7 @@ function App() {
 	};
 
 	const handleSearch = () => {
-		setTicker(tickerTextInput);
+		setTicker(tickerTextInput.toUpperCase());
 	};
 
 	const handleKeyPress = (e) => {
@@ -168,32 +168,68 @@ function App() {
 			}
 			return (
 				<>
-					<h1>{ticker} Income Statement Overview</h1>
-					<div className="error-message" style={{ color: 'red', margin: '20px' }}>
+					<div className="text-red-500 m-5">
 						{errorMessage}
 					</div>
 				</>
 			);
 		}
 
+		if (loading) {
+			return (
+				<div className="text-[2vmin]">
+					<h1 className="text-2xl font-bold mb-4">Loading...</h1>
+					<table className="w-full border-collapse">
+						<thead>
+							<tr>
+								{columnConfig.map(({ title, key }) => (
+									<th key={key} className="p-2 border border-gray-600">
+										<div className="flex items-center gap-1">
+											{title}
+										</div>
+									</th>
+								))}
+							</tr>
+						</thead>
+						<tbody>
+							{[...Array(5)].map((_, index) => (
+								<tr key={index}>
+									{columnConfig.map(({ key }) => (
+										<td key={key} className="border border-gray-600 p-2">
+											<div className="h-4 bg-gray-600 rounded animate-pulse"></div>
+										</td>
+									))}
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			);
+		}
+
+		// Handle cases if there isn't any financial reports from the API
+		if (!data || data.length === 0) {
+			return (
+				<div className="text-2xl font-bold text-red-500">
+					Invalid input
+				</div>
+			);
+		}
+
 		return (
 			<>
-				<div
-					style = {{
-						fontSize: `calc(2vmin)`
-					}}>
-					<h1>{ticker} Income Statement Overview</h1>
-					<table>
+				<div className="text-[2vmin]">
+					<h1 className="text-2xl font-bold mb-4">{ticker} Income Statement Overview</h1>
+					<table className="w-full border-collapse">
 						<thead>
-							{/* HEADERS */}
 							<tr>
 								{columnConfig.map(({ title, key }) => (
 									<th
 										key={key}
 										onClick={() => handleSort(key)}
-										style={{ cursor: 'pointer' }}
+										className="cursor-pointer p-2 border border-gray-600"
 									>
-										<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+										<div className="flex items-center gap-1">
 											{title}
 											<Icon name={sortConfig.key === key
 												? `sort-${sortConfig.direction}`
@@ -208,57 +244,32 @@ function App() {
 						<tbody>
 							{sortedData.map((item, index) => (
 								<tr key={index}>
-									{/* DATA FOR EACH COLUMN */}
-									<td style={{ border: '1px solid black', padding: '10px' }}>{item.date}</td>
-									<td style={{ border: '1px solid black', padding: '10px' }}>${item.revenue}</td>
-									<td style={{ border: '1px solid black', padding: '10px' }}>${item.netIncome}</td>
-									<td style={{ border: '1px solid black', padding: '10px' }}>${item.grossProfit}</td>
-									<td style={{ border: '1px solid black', padding: '10px' }}>${item.eps}</td>
-									<td style={{ border: '1px solid black', padding: '10px' }}>${item.operatingIncome}</td>
+									<td className="border border-gray-600 p-2">{item.date}</td>
+									<td className="border border-gray-600 p-2">${item.revenue}</td>
+									<td className="border border-gray-600 p-2">${item.netIncome}</td>
+									<td className="border border-gray-600 p-2">${item.grossProfit}</td>
+									<td className="border border-gray-600 p-2">${item.eps}</td>
+									<td className="border border-gray-600 p-2">${item.operatingIncome}</td>
 								</tr>
 							))}
 						</tbody>
 					</table>
-					{/* Raw JSON: */}
-					{/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
 				</div>
 			</>
 		)
 	}
 
 	return (
-		<>
-			<div className="App">
-				<header className="App-header">
-					{/* Split page into 3 columns */}
-					<div 
-						style={{
-						display: 'flex',
-						justifyContent: 'space-between',
-						gap: '20px',
-						width: '100%'
-					}}>
-						{/* Column 1 */}
-						<div 
-							style= {{
-								flex: '1',
-								padding: '20px'
-							}}>
+		<div className="App">
+			<header className="min-h-screen bg-[#323232] text-white flex flex-col items-center justify-center text-[calc(5px+1vmin)]">
+				<div className="flex justify-between gap-5 w-full">
+					<div className="w-1/4 min-w-[250px] p-5">
+						<div className="flex flex-col items-center justify-center h-full gap-2">
 
-							<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-								<div 
-									style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-									<button
-										onClick={handleUpdateFilter}
-										style={{ display: 'flex', alignItems: 'center' }}>
-										<span style={{ marginLeft: '5px' }}>Update Filter:</span>
-										<Icon name="filter" />
-									</button>
-								</div>
-
+							<div>
 								<p>Filter by Date:</p>
 								<DatePicker
-									style={{ color: 'black', padding: '5px' }}
+									className="text-black p-1 rounded"
 									showMonthYearPicker
 									selectsRange
 									isClearable
@@ -271,14 +282,16 @@ function App() {
 									startDate={dateInputs.start}
 									endDate={dateInputs.end}
 								/>
+							</div>
 
+							<div>
 								<p>Filter by Revenue:</p>
-								<div style={{ display: 'flex', alignItems: 'center' }}>
+								<div className="flex items-center gap-2">
 									<input
 										type="number"
 										value={revenueInputs.start}
 										placeholder="Lower Revenue"
-										style={{ color: 'black', padding: '5px', marginRight: '5px' }}
+										className="text-black p-1 rounded"
 										onChange={(e) => setRevenueInputs(prev => ({ ...prev, start: e.target.value }))}
 									/>
 									<span>-</span>
@@ -286,18 +299,20 @@ function App() {
 										type="number"
 										value={revenueInputs.end}
 										placeholder="Upper Revenue"
-										style={{ color: 'black', padding: '5px', marginLeft: '5px' }}
+										className="text-black p-1 rounded"
 										onChange={(e) => setRevenueInputs(prev => ({ ...prev, end: e.target.value }))}
 									/>
 								</div>
+							</div>
 
+							<div>
 								<p>Filter by Net Income:</p>
-								<div style={{ display: 'flex', alignItems: 'center' }}>
+								<div className="flex items-center gap-2">
 									<input
 										type="number"
 										value={netIncomeInputs.start}
 										placeholder="Lower Net Income"
-										style={{ color: 'black', padding: '5px', marginRight: '5px' }}
+										className="text-black p-1 rounded"
 										onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, start: e.target.value }))}
 									/>
 									<span>-</span>
@@ -305,56 +320,51 @@ function App() {
 										type="number"
 										value={netIncomeInputs.end}
 										placeholder="Upper Net Income"
-										style={{ color: 'black', padding: '5px', marginLeft: '5px' }}
+										className="text-black p-1 rounded"
 										onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, end: e.target.value }))}
 									/>
 								</div>
-								<p>Filtering {filteredCount} {filteredCount === 1 ? "statement" : "statements"}</p>
 							</div>
-						</div>
 
-						{/* Column 2, main content */}
-						<div style={{ 
-							flex: '2', 
-							display: 'flex', 
-							flexDirection: 'column', 
-							alignItems: 'center'
-							}}>
-							<div style={{ 
-								position: 'relative', 
-								display: 'inline-block', 
-								marginBottom: '10px' }}>
-								<input
-									type="text"
-									value={tickerTextInput}
-									onChange={(e) => setTickerTextInput(e.target.value)}
-									onKeyDown={handleKeyPress}
-									placeholder="Enter stock ticker"
-									style={{ color: 'black', padding: '5px' }}
-								/>
+							<p>Filtering {filteredCount} {filteredCount === 1 ? "statement" : "statements"}</p>
+
+							<div className="flex items-center justify-end">
 								<button
-									onClick={() => setTicker(tickerTextInput)}
-									style={{
-										position: 'absolute',
-										right: '10px',
-										top: '50%',
-										transform: 'translateY(-50%)',
-										background: 'none',
-										border: 'none',
-										padding: 0
-									}}>
-									<Icon name="arrow-big-right" />
+									onClick={handleUpdateFilter}
+									className="flex items-center gap-1 bg-[#162055] hover:bg-blue-600 px-3 py-1 rounded"
+								>
+									<span>Update Filter:</span>
+									<Icon name="filter" />
 								</button>
 							</div>
-							{loading ? (<div>Loading...</div>) : (updateTable(data))}
 						</div>
+					</div>
 
-						{/* Column 3 */}
-						<div style={{
-							flex: '1',
-							padding: '20px'
-						}}>
-							<ResponsiveContainer width="100%" height="100%">
+					<div className="w-2/4 min-w-[500px] flex flex-col items-center">
+						<div className="relative inline-block mb-2">
+							<input
+								type="text"
+								value={tickerTextInput}
+								onChange={(e) => setTickerTextInput(e.target.value.toUpperCase())}
+								onKeyDown={handleKeyPress}
+								placeholder="Enter stock ticker"
+								className="text-black p-1 rounded pr-8"
+							/>
+							<button
+								onClick={() => setTicker(tickerTextInput.toUpperCase())}
+								className="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-none p-0"
+							>
+								<Icon name="arrow-big-right" />
+							</button>
+						</div>
+						{loading ? <div>Loading...</div> : updateTable(data)}
+					</div>
+
+					<div className="w-1/4 min-w-[250px] p-5">
+						{loading ? (
+							<div className="w-full h-[400px] bg-gray-600/30 rounded animate-pulse" />
+						) : (
+							<ResponsiveContainer width="100%" height={400}>
 								<LineChart
 									data={chartData}
 									margin={{
@@ -365,43 +375,47 @@ function App() {
 									}}
 								>
 									<CartesianGrid strokeDasharray="3 3" />
-									<XAxis 
-										dataKey="date" 
-										tick={{ fill: 'white', angle: 45, textAnchor: 'start' }}  // Make axis labels white and diagonal
+									<XAxis
+										dataKey="date"
+										tick={{ fill: 'white', angle: 90, textAnchor: 'start' }}
 										reversed={true}
+										allowDataOverflow={true}
+										interval={0}
+										ticks={chartData.map(data => data.date)} // Include all x points
 									/>
-									<YAxis 
-										tick={{ fill: 'white' }}  // Make axis labels white
+									<YAxis
+										tick={{ fill: 'white' }}
 										tickFormatter={formatLargeNumbers}
+										domain={['dataMin', 'dataMax']}
+										type="number"
 									/>
-									<Tooltip 
+									<Tooltip
 										formatter={(value) => formatLargeNumbers(value)}
 										labelStyle={{ color: 'black' }}
 									/>
 									<Line
 										type="monotone"
 										dataKey="revenue"
-										stroke="#8884d8"
+										stroke="#09809e"
 										strokeWidth={2}
 										dot={{ fill: '#8884d8' }}
 									/>
 								</LineChart>
 							</ResponsiveContainer>
-						</div>
+						)}
 					</div>
-
-				</header>
-			</div>
-		</>
+				</div>
+			</header>
+		</div>
 	);
 }
 
 export default App;
 
 /*
-Bugs:
-- Date filter text is white but I can't get CSS to fix it
+Required to add:
+- Responsive design for PC/Mobile displays
 
 Potential additions:
-- Buttons to display chart for other columns 
+- Buttons to display chart for other columns
 */

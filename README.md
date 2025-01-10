@@ -16,6 +16,7 @@ This app fetches annual income statements for stocks, such as Apple, and allows 
 5. In the terminal, run the command `cd app`
 6. Make sure you have all the required dependencies with `npm install`
 7. Then run the command `npm start` (to end the app, press CTRL+C in the terminal)
+    <br>(Optional: to properly keep the TailwindCSS updated, open another terminal to the app and use `npm run watch:css`)
 8. Open [http://localhost:3000/](http://localhost:3000/) (it should automatically open)
 
 # Interactivity:
