@@ -545,6 +545,10 @@ video {
   display: none;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }
@@ -793,6 +797,11 @@ video {
   border-bottom-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
 }
 
+.border-e-white {
+  --tw-border-opacity: 1;
+  border-inline-end-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
+}
+
 .bg-\[\#162055\] {
   --tw-bg-opacity: 1;
   background-color: rgb(22 32 85 / var(--tw-bg-opacity, 1));
@@ -829,6 +838,16 @@ video {
 .bg-\[\#181a1b\] {
   --tw-bg-opacity: 1;
   background-color: rgb(24 26 27 / var(--tw-bg-opacity, 1));
+}
+
+.bg-blue-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(96 165 250 / var(--tw-bg-opacity, 1));
+}
+
+.bg-\[\#121a44\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(18 26 68 / var(--tw-bg-opacity, 1));
 }
 
 .p-0 {
@@ -870,12 +889,21 @@ video {
   padding-bottom: 0.25rem;
 }
 
+.py-5 {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
 .pr-8 {
   padding-right: 2rem;
 }
 
 .pb-4 {
   padding-bottom: 1rem;
+}
+
+.pt-5 {
+  padding-top: 1.25rem;
 }
 
 .text-center {
@@ -905,6 +933,16 @@ video {
 
 .text-\[calc\(5px\+1vmin\)\] {
   font-size: calc(5px + 1vmin);
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 
 .font-bold {

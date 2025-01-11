@@ -284,7 +284,6 @@ function App() {
 	return (
 		<div className="App">
 			<header className="min-h-screen bg-[#181a1b] text-white flex flex-col items-center justify-center text-[calc(5px+1vmin)]">
-
 				<div className="w-full mx-auto flex flex-col 2xl:flex-row 2xl:flex-nowrap justify-between gap-4 max-w-[1920px] p-4">
 
 					{/* COLUMN 1 */}
