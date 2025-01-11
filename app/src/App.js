@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+// Initial stock ticker upon loading the page
 let stockTicker = "AAPL"
 
 // Dynamically fetch icons just by calling filename
@@ -177,14 +178,14 @@ function App() {
 
 		if (loading) {
 			return (
-				<div className="text-[2vmin]">
-					<h1 className="text-2xl font-bold mb-4">Loading...</h1>
-					<table className="w-full border-collapse">
+				<div className="w-full text-[2vmin] px-8">
+					<h1 className="font-bold mb-4">Loading...</h1>
+					<table className="w-full border-collapse table-fixed">
 						<thead>
 							<tr>
 								{columnConfig.map(({ title, key }) => (
 									<th key={key} className="p-2 border border-gray-600">
-										<div className="flex items-center gap-1">
+										<div className="flex items-center justify-center gap-2 text-[1.75vmin]">
 											{title}
 										</div>
 									</th>
@@ -195,7 +196,7 @@ function App() {
 							{[...Array(5)].map((_, index) => (
 								<tr key={index}>
 									{columnConfig.map(({ key }) => (
-										<td key={key} className="border border-gray-600 p-2">
+										<td key={key} className="border border-gray-600 p-2 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">
 											<div className="h-4 bg-gray-600 rounded animate-pulse"></div>
 										</td>
 									))}
@@ -219,18 +220,19 @@ function App() {
 		// Display the resulting table
 		return (
 			<>
-				<div className="text-[2vmin]">
-					<h1 className="text-2xl font-bold mb-4">{ticker} Income Statement Overview</h1>
-					<table className="w-full border-collapse">
+				<div className="w-full text-[2vmin] px-8">
+					<h1 className="font-bold mb-4">{ticker} Income Statement Overview</h1>
+
+					<table className="w-full border-collapse table-fixed">
 						<thead>
 							<tr>
 								{columnConfig.map(({ title, key }) => (
 									<th
 										key={key}
 										onClick={() => handleSort(key)}
-										className="cursor-pointer p-4 border border-gray-600"
+										className="cursor-pointer border border-gray-600"
 									>
-										<div className="flex items-center gap-1">
+										<div className="flex items-center justify-center gap-2 text-[1.75vmin] p-1"> {/*  gap between column title and sort icon*/}
 											{title}
 											{sortConfig.key === key && (
 												<Icon name={`sort-${sortConfig.direction}`} />
@@ -243,12 +245,12 @@ function App() {
 						<tbody>
 							{sortedData.map((item, index) => (
 								<tr key={index}>
-									<td className="border border-gray-600 p-2">{item.date}</td>
-									<td className="border border-gray-600 p-2">${item.revenue}</td>
-									<td className="border border-gray-600 p-2">${item.netIncome}</td>
-									<td className="border border-gray-600 p-2">${item.grossProfit}</td>
-									<td className="border border-gray-600 p-2">${item.eps}</td>
-									<td className="border border-gray-600 p-2">${item.operatingIncome}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{item.date}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.revenue}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.netIncome}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.grossProfit}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.eps}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.operatingIncome}</td>
 								</tr>
 							))}
 						</tbody>
@@ -262,10 +264,11 @@ function App() {
 		<div className="App">
 			<header className="min-h-screen bg-[#323232] text-white flex flex-col items-center justify-center text-[calc(5px+1vmin)]">
 
-				<div className="w-full container mx-auto flex flex-col md:flex-row md:flex-nowrap justify-between gap-4 max-w-[1920px] p-4">
-					<aside className="w-full md:w-1/4 p-5 border border-gray-600 rounded-lg">
+				<div className="w-full mx-auto flex flex-col 2xl:flex-row 2xl:flex-nowrap justify-between gap-1 max-w-[1920px] p-4">
+
+					{/* COLUMN 1 */}
+					<aside className="w-full 2xl:w-1/4 p-5 border border-gray-600 rounded-lg">
 						<div className="flex flex-col items-center justify-center h-full gap-2 ">
-							{/* COLUMN 1 */}
 							<div>
 								<p>Filter by Date:</p>
 								<DatePicker
@@ -339,9 +342,10 @@ function App() {
 							</div>
 						</div>
 					</aside>
+
 					{/* COLUMN 2 */}
-					<div className="flex-grow md:w-2/4 flex flex-col items-center border border-gray-600 rounded-lg">
-						<div className="relative inline-block mb-2">
+					<div className="flex-grow 2xl:w-2/4 flex flex-col items-center border border-gray-600 rounded-lg">
+						<div className="relative inline-block my-3">
 							<input
 								type="text"
 								value={tickerTextInput}
@@ -359,8 +363,9 @@ function App() {
 						</div>
 						{loading ? <div>Loading...</div> : updateTable(data)}
 					</div>
+
 					{/* COLUMN 3 */}
-					<aside className="lg:w-1/4 p-5 border border-gray-600 rounded-lg">
+					<aside className="w-full 2xl:w-1/4 p-5 border border-gray-600 rounded-lg">
 						{loading ? (
 							<div className="w-full h-[400px] bg-gray-600/30 rounded animate-pulse" />
 						) : (
@@ -381,7 +386,7 @@ function App() {
 										reversed={true}
 										allowDataOverflow={true}
 										interval={0}
-										ticks={chartData.map(data => data.date)} // Include all x points
+										ticks={chartData.map(data => data.date)}
 									/>
 									<YAxis
 										tick={{ fill: 'white' }}
@@ -411,11 +416,3 @@ function App() {
 }
 
 export default App;
-
-/*
-Required to add:
-- Responsive design for PC/Mobile displays
-
-Potential additions:
-- Buttons to display chart for other columns
-*/
