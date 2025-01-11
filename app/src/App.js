@@ -246,11 +246,11 @@ function App() {
 							{sortedData.map((item, index) => (
 								<tr key={index}>
 									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{item.date}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.revenue}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.netIncome}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.grossProfit}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.revenue)}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.netIncome)}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.grossProfit)}</td>
 									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.eps}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.operatingIncome}</td>
+									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.operatingIncome)}</td>
 								</tr>
 							))}
 						</tbody>
