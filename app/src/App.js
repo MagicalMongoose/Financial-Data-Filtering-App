@@ -13,7 +13,7 @@ const Icons = require.context('./Assets', false, /\.svg$/);
 const Icon = ({ name }) => {
 	try {
 		const iconPath = Icons(`./${name}.svg`);
-		return <img src={iconPath} alt={name} style={{ width: '24px', height: '24px' }} />;
+		return <img src={iconPath} alt={name} style={{ width: '24px', height: '24px'}} />;
 	} catch (error) {
 		console.error(`Icon ${name} not found`);
 		return null;
@@ -57,7 +57,7 @@ function App() {
 
 	const [filteredCount, setFilteredCount] = useState(0);
 
-	// State for active filters (updates only when "Update Filter" is clicked)
+	// State for active filters (updates only when "Update Filter" or "Reset Filters" are clicked)
 	const [activeFilters, setActiveFilters] = useState({
 		date: { start: null, end: null },
 		revenue: { start: '', end: '' },
@@ -155,6 +155,20 @@ function App() {
 		});
 	};
 
+	const resetFilters = () => {
+		// Clear the text inputs
+		setDateInputs({ start: null, end: null });
+		setRevenueInputs({ start: '', end: '' });
+		setNetIncomeInputs({ start: '', end: '' });
+		
+		// Set active filter list back to none
+		setActiveFilters({
+			date: { start: null, end: null },
+			revenue: { start: '', end: '' },
+			netIncome: { start: '', end: '' }
+		});
+	}
+
 	const filteredData = data ? filterData(data) : [];
 	const sortedData = sortData(filteredData);
 	const chartData = [...filteredData].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -184,7 +198,7 @@ function App() {
 						<thead>
 							<tr>
 								{columnConfig.map(({ title, key }) => (
-									<th key={key} className="p-2 border border-gray-600">
+									<th key={key} className="p-2 border border-[#42484b]">
 										<div className="flex items-center justify-center gap-2 text-[1.75vmin]">
 											{title}
 										</div>
@@ -196,7 +210,7 @@ function App() {
 							{[...Array(5)].map((_, index) => (
 								<tr key={index}>
 									{columnConfig.map(({ key }) => (
-										<td key={key} className="border border-gray-600 p-2 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">
+										<td key={key} className="border border-[#42484b] p-2 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">
 											<div className="h-4 bg-gray-600 rounded animate-pulse"></div>
 										</td>
 									))}
@@ -217,6 +231,13 @@ function App() {
 			);
 		}
 
+		// Handle case if there is data but it is all filtered out
+		if (sortedData.length === 0) {
+			return (
+				<div className="text-2xl font-bold">All data has been hidden due to selected filters.</div>
+			);
+		}
+
 		// Display the resulting table
 		return (
 			<>
@@ -230,7 +251,7 @@ function App() {
 									<th
 										key={key}
 										onClick={() => handleSort(key)}
-										className="cursor-pointer border border-gray-600"
+										className="cursor-pointer border border-[#42484b]"
 									>
 										<div className="flex items-center justify-center gap-2 text-[1.75vmin] p-3"> {/*  gap between column title and sort icon*/}
 											{title}
@@ -245,12 +266,12 @@ function App() {
 						<tbody>
 							{sortedData.map((item, index) => (
 								<tr key={index}>
-									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{item.date}</td>
-									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.revenue)}</td>
-									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.netIncome)}</td>
-									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.grossProfit)}</td>
-									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">${item.eps}</td>
-									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.operatingIncome)}</td>
+									<td className="border border-[#42484b] p-2 text-center text-[1.55vmin]">{item.date}</td>
+									<td className="border border-[#42484b] p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.revenue)}</td>
+									<td className="border border-[#42484b] p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.netIncome)}</td>
+									<td className="border border-[#42484b] p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.grossProfit)}</td>
+									<td className="border border-[#42484b] p-2 text-center text-[1.55vmin]">${item.eps}</td>
+									<td className="border border-[#42484b] p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.operatingIncome)}</td>
 								</tr>
 							))}
 						</tbody>
@@ -262,17 +283,17 @@ function App() {
 
 	return (
 		<div className="App">
-			<header className="min-h-screen bg-[#323232] text-white flex flex-col items-center justify-center text-[calc(5px+1vmin)]">
+			<header className="min-h-screen bg-[#181a1b] text-white flex flex-col items-center justify-center text-[calc(5px+1vmin)]">
 
-				<div className="w-full mx-auto flex flex-col 2xl:flex-row 2xl:flex-nowrap justify-between gap-1 max-w-[1920px] p-4">
+				<div className="w-full mx-auto flex flex-col 2xl:flex-row 2xl:flex-nowrap justify-between gap-4 max-w-[1920px] p-4">
 
 					{/* COLUMN 1 */}
-					<aside className="w-full 2xl:w-1/4 p-5 border border-gray-600 rounded-lg">
+					<aside className="w-full 2xl:w-1/4 p-5 border-4 border-[#42484b] rounded-lg">
 						<div className="flex flex-col items-center justify-center h-full gap-2 ">
 							<div>
 								<p>Filter by Date:</p>
 								<DatePicker
-									className="text-black p-1 rounded"
+									className="text-black p-1 rounded w-[20vmin]"
 									showMonthYearPicker
 									selectsRange
 									isClearable
@@ -294,7 +315,7 @@ function App() {
 										type="number"
 										value={revenueInputs.start}
 										placeholder="Lower Revenue"
-										className="text-black p-1 rounded"
+										className="text-black p-1 rounded w-[15vmin]"
 										onChange={(e) => setRevenueInputs(prev => ({ ...prev, start: e.target.value }))}
 									/>
 									<span>-</span>
@@ -302,7 +323,7 @@ function App() {
 										type="number"
 										value={revenueInputs.end}
 										placeholder="Upper Revenue"
-										className="text-black p-1 rounded"
+										className="text-black p-1 rounded w-[15vmin]"
 										onChange={(e) => setRevenueInputs(prev => ({ ...prev, end: e.target.value }))}
 									/>
 								</div>
@@ -315,7 +336,7 @@ function App() {
 										type="number"
 										value={netIncomeInputs.start}
 										placeholder="Lower Net Income"
-										className="text-black p-1 rounded"
+										className="text-black p-1 rounded w-[15vmin]"
 										onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, start: e.target.value }))}
 									/>
 									<span>-</span>
@@ -323,7 +344,7 @@ function App() {
 										type="number"
 										value={netIncomeInputs.end}
 										placeholder="Upper Net Income"
-										className="text-black p-1 rounded"
+										className="text-black p-1 rounded w-[15vmin]"
 										onChange={(e) => setNetIncomeInputs(prev => ({ ...prev, end: e.target.value }))}
 									/>
 								</div>
@@ -340,11 +361,22 @@ function App() {
 									<Icon name="filter" />
 								</button>
 							</div>
+
+							{
+							/*if*/ filteredCount === 0
+									? <div></div>
+									: <button
+										onClick={resetFilters}
+										className="underline">
+										Reset filters?
+									</button>
+							}
+
 						</div>
 					</aside>
 
 					{/* COLUMN 2 */}
-					<div className="flex-grow 2xl:w-2/4 flex flex-col items-center border border-gray-600 rounded-lg">
+					<div className="flex-grow 2xl:w-2/4 flex flex-col items-center border-4 border-[#42484b] rounded-lg pb-4">
 						<div className="relative inline-block my-3">
 							<input
 								type="text"
@@ -352,7 +384,7 @@ function App() {
 								onChange={(e) => setTickerTextInput(e.target.value.toUpperCase())}
 								onKeyDown={handleKeyPress}
 								placeholder="Enter stock ticker"
-								className="text-black p-1 rounded pr-8"
+								className="text-black p-1 rounded pr-8 w-[20vmin]"
 							/>
 							<button
 								onClick={() => setTicker(tickerTextInput.toUpperCase())}
@@ -365,9 +397,9 @@ function App() {
 					</div>
 
 					{/* COLUMN 3 */}
-					<aside className="w-full 2xl:w-1/4 p-5 border border-gray-600 rounded-lg">
+					<aside className="w-full 2xl:w-1/4 p-5 border-4 border-[#42484b] rounded-lg">
 						{loading ? (
-							<div className="w-full h-[400px] bg-gray-600/30 rounded animate-pulse" />
+							<div className="w-full h-[400px] border-[#42484b]/30 rounded animate-pulse" />
 						) : (
 							<ResponsiveContainer width="100%" height={400}>
 								<LineChart
