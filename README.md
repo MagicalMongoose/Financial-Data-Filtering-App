@@ -25,7 +25,7 @@ This app fetches annual income statements for stocks, such as Apple, and allows 
 3. You can sort the data by clicking the title of any of the table columns.
 4. You can visualize the data in the Chart section.
 
-[Source code](https://github.com/MagicalMongoose/Financial-Data-Filtering-App#financial-data-filtering-app)
+[Source code](https://github.com/MagicalMongoose/Financial-Data-Filtering-App/blob/main/app/src/App.js)
 
 Notes:
 - I added data caching so the API doesn't rate limit the user.
