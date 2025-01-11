@@ -232,7 +232,7 @@ function App() {
 										onClick={() => handleSort(key)}
 										className="cursor-pointer border border-gray-600"
 									>
-										<div className="flex items-center justify-center gap-2 text-[1.75vmin] p-1"> {/*  gap between column title and sort icon*/}
+										<div className="flex items-center justify-center gap-2 text-[1.75vmin] p-3"> {/*  gap between column title and sort icon*/}
 											{title}
 											{sortConfig.key === key && (
 												<Icon name={`sort-${sortConfig.direction}`} />
@@ -245,12 +245,12 @@ function App() {
 						<tbody>
 							{sortedData.map((item, index) => (
 								<tr key={index}>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{item.date}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.revenue)}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.netIncome)}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.grossProfit)}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">${item.eps}</td>
-									<td className="border border-gray-600 p-2.5 text-center text-[1.5vmin] 2xl:text-[1.55vmin]">{formatLargeNumbers(item.operatingIncome)}</td>
+									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{item.date}</td>
+									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.revenue)}</td>
+									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.netIncome)}</td>
+									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.grossProfit)}</td>
+									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">${item.eps}</td>
+									<td className="border border-gray-600 p-2 text-center text-[1.55vmin]">{formatLargeNumbers(item.operatingIncome)}</td>
 								</tr>
 							))}
 						</tbody>
